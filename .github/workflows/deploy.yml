@@ -1,0 +1,60 @@
+name: Test and Deploy to Lambda
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies (for testing and packaging)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run tests
+        run: |
+          pytest tests/
+
+      - name: Build deployment package
+        run: |
+          mkdir -p python
+          pip install -r requirements.txt -t python/
+          mkdir package
+          cp -r src/ package/
+          cp lambda_handler.py package/
+          cp -r python/* package/
+          cd package
+          zip -r ../lambda_package.zip .
+
+      - name: Deploy to AWS Lambda
+        uses: appleboy/lambda-action@v0.2.0
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          function_name: extractInvoiceLambda
+          zip_file: lambda_package.zip
+
+      - name: Notify failure on Discord
+        if: failure()
+        uses: Ilshidur/action-discord@master
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          message: |
+            ❌ Le déploiement de la fonction Lambda a échoué sur le repo `${{ github.repository }}` !
+            Branche : `${{ github.ref_name }}`
+            Auteur : `${{ github.actor }}`
+            Voir les logs : ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
