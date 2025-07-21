@@ -4,7 +4,7 @@ from io import BytesIO
 from PyPDF2 import PdfReader
 from datetime import datetime
 
-SERPAPI_API_KEY = os.getenv("SERA_API_KEY")
+SERPAPI_API_KEY = os.getenv("SERPAPI_KEY")
 
 def get_pdf_page_count(url):
     try:

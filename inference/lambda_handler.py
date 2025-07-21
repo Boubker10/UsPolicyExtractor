@@ -43,7 +43,6 @@ def lambda_handler(event, context):
         question = question.strip()
         logger.info(f"Question received: {question}")
         
-        # Construction et exécution de la pipeline
         logger.info("Building pipeline...")
         pipeline = build_pipeline(question)
         
