@@ -5,6 +5,11 @@ on:
     branches:
       - main
 
+env:
+  AWS_REGION: eu-north-1  
+  IMAGE_NAME: legal-ocr-agent
+  LAMBDA_FUNCTION_NAME: legal-ocr-agent
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -18,7 +23,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Log in to Amazon ECR
         id: ecr-login
@@ -26,19 +31,14 @@ jobs:
 
       - name: Build Docker image
         run: |
-          IMAGE_NAME=legal-ocr-agent
-          TAG=latest
-          docker build -t $IMAGE_NAME:$TAG .
+          docker build -t ${{ env.IMAGE_NAME }}:latest .
 
       - name: Tag Docker image for ECR
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          REGION=${{ secrets.AWS_REGION }}
-          REPO_NAME=legal-ocr-agent
-          IMAGE_TAG=latest
-          ECR_URI=$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+          ECR_URI=$ACCOUNT_ID.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}:latest
 
-          docker tag legal-ocr-agent:$IMAGE_TAG $ECR_URI
+          docker tag ${{ env.IMAGE_NAME }}:latest $ECR_URI
           echo "ECR_URI=$ECR_URI" >> $GITHUB_ENV
 
       - name: Push Docker image to ECR
@@ -48,5 +48,5 @@ jobs:
       - name: Deploy Lambda function with new image
         run: |
           aws lambda update-function-code \
-            --function-name legal-ocr-agent \
+            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
             --image-uri $ECR_URI
