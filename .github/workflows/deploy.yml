@@ -89,7 +89,6 @@ jobs:
           else
             echo "Function already exists"
           fi
-# Wait for Lambda function to be ready before updating configuration
       - name: Wait for Lambda function to be ready
         run: |
           echo "Waiting for Lambda function to be active..."
@@ -103,18 +102,3 @@ jobs:
                   --environment Variables="{DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }},SERPAPI_KEY=${{ secrets.SERPAPI_API_KEY }}}" \
                   --timeout 900 \
                   --memory-size 1024
-
-      - name: Deploy Lambda function with new image
-        run: |
-          echo "Updating Lambda function code..."
-          aws lambda update-function-code \
-            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
-            --image-uri $ECR_URI
-          echo "Lambda function updated successfully"
-
-      - name: Wait for Lambda function to be updated
-        run: |
-          echo "Waiting for Lambda function update to complete..."
-          aws lambda wait function-updated \
-            --function-name ${{ env.LAMBDA_FUNCTION_NAME }}
-          echo "Lambda function update completed"
