@@ -20,7 +20,6 @@ def lambda_handler(event, context):
         if missing_vars:
             raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
         
-        # Validation de l'événement
         if "body" not in event or event["body"] is None:
             raise ValueError("Missing body in event")
         
