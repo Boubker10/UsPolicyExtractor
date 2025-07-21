@@ -70,6 +70,26 @@ jobs:
           docker push $ECR_URI
           echo "Image pushed successfully"
 
+      - name: Create Lambda function if it doesn't exist
+        run: |
+          echo "Checking if Lambda function exists..."
+          if ! aws lambda get-function --function-name ${{ env.LAMBDA_FUNCTION_NAME }} >/dev/null 2>&1; then
+            echo "Function doesn't exist. Creating it..."
+            ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+            IMAGE_URI=$ACCOUNT_ID.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}:latest
+            aws lambda create-function \
+              --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+              --package-type Image \
+              --code ImageUri=$IMAGE_URI \
+              --role arn:aws:iam::<TON_ACCOUNT_ID>:role/<TON_ROLE_LAMBDA> \
+              --timeout 900 \
+              --memory-size 1024 \
+              --region ${{ env.AWS_REGION }}
+            echo "Function created successfully"
+          else
+            echo "Function already exists"
+          fi
+
       - name: Update Lambda environment variables
         run: |
           echo "Updating Lambda environment variables..."
