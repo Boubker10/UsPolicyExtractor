@@ -25,4 +25,4 @@ RUN pip install --upgrade pip && pip install --no-cache-dir \
     requests \
     python-dotenv
 
-CMD ["src.lambda_handler.lambda_handler"]
+CMD ["inference.lambda_handler.lambda_handler"]

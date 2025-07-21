@@ -1,0 +1,14 @@
+{
+  "resource": "/ask",
+  "path": "/ask",
+  "httpMethod": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "queryStringParameters": null,
+  "pathParameters": null,
+  "stageVariables": null,
+  "requestContext": {},
+  "body": "{\"question\": \"can i film with a camera in public in US?\"}",
+  "isBase64Encoded": false
+}
