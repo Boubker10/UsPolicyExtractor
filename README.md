@@ -1,5 +1,5 @@
 
-# Deployment Guide: AWS ECR and EC2 for Legal OCR Agent
+# Deployment Guide: AWS ECR and EC2 for UsPolicyExtractor
 
 This guide explains how to build and push your Docker image to AWS Elastic Container Registry (ECR), and then run/test the container on an AWS EC2 instance.
 
