@@ -1,10 +1,28 @@
-FROM python:3.10-slim
+FROM public.ecr.aws/lambda/python:3.10
 
-WORKDIR /app
+RUN yum -y install \
+    tesseract \
+    poppler-utils \
+    ghostscript \
+    libSM \
+    libXext \
+    libXrender \
+    && yum clean all
 
-COPY . /app
+WORKDIR /var/task
 
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+COPY . .
 
-CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--allow-root", "--no-browser"]
+RUN pip install --upgrade pip && pip install --no-cache-dir \
+    pytesseract \
+    pdf2image \
+    sentence-transformers \
+    scikit-learn \
+    numpy \
+    openai \
+    Pillow \
+    PyPDF2 \
+    requests \
+    python-dotenv
+
+CMD ["src.lambda_handler.lambda_handler"]

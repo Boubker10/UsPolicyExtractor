@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda OCR PDF agent with RAG using Docker
+
+Resources:
+  LegalResearchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      FunctionName: legal-ocr-agent
+      Timeout: 900
+      MemorySize: 1024
+      Environment:
+        Variables:
+          DEEPSEEK_API_KEY: YOUR_DEEPSEEK_KEY
+          SERA_API_KEY: YOUR_SERPAPI_KEY
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: .
+      DockerTag: latest
+
+Outputs:
+  LegalResearchFunctionArn:
+    Description: "OCR Legal Agent Lambda Function ARN"
+    Value: Fn::GetAtt LegalResearchFunction.Arn
