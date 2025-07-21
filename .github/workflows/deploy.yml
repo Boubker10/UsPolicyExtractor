@@ -81,7 +81,7 @@ jobs:
               --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
               --package-type Image \
               --code ImageUri=$IMAGE_URI \
-              --role arn:aws:iam::<TON_ACCOUNT_ID>:role/<TON_ROLE_LAMBDA> \
+              --role arn:aws:iam::841731976034:role/lambda-legal-ocr-role \
               --timeout 900 \
               --memory-size 1024 \
               --region ${{ env.AWS_REGION }}
